@@ -1,0 +1,6 @@
+!/src
+/target
+*.jar
+*.exe
+*.app
+
