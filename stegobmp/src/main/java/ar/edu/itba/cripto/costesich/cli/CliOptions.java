@@ -4,13 +4,18 @@ import org.kohsuke.args4j.CmdLineException;
 import org.kohsuke.args4j.CmdLineParser;
 import org.kohsuke.args4j.Option;
 
-import java.nio.file.Path;
+import java.io.File;
 
 public class CliOptions {
 
     private boolean errorFree;
 
-    @Option(name = "-embed", aliases = { "--embed"}, required = false,
+
+    @Option(name = "-h", aliases = { "--help"}, required = false,
+            usage = "Help", forbids={"-embed", "--embed", "-extract", "--extract"})
+    private boolean help;
+
+    @Option(name = "-embed", aliases = { "--embed"}, depends = {"-in"},
             usage = "Embed mode", forbids={"-extract", "--extract"})
     private boolean embed;
 
@@ -18,31 +23,31 @@ public class CliOptions {
             usage = "Extract mode", forbids={"-embed", "--embed"})
     private boolean extract;
 
-    @Option(name = "-in", aliases = { "--input"}, required = false,
-            usage = "File to hide 🕵🏻‍♂️")
-    private Path inputBitmap;
+    @Option(name = "-in", aliases = {"--input"}, required = false,
+            usage = "File to hide️")
+    private File inputBitmap;
 
-    @Option(name = "-p", aliases = { "--portador"}, required = true,
-            usage = "Carrier file 🧟‍♂️️")
-    private Path carrierFile;
+    @Option(name = "-p", aliases = {"--portador"}, required = true,
+            usage = "Carrier file️️")
+    private File carrierFile;
 
-    @Option(name = "-out", aliases = { "--out"}, required = true,
+    @Option(name = "-out", aliases = {"--out"}, required = true,
             usage = "Output file")
-    private Path outputBitmap;
+    private File outputBitmap;
 
     @Option(name = "-steg", aliases = { "--steg"}, required = true,
-            usage = "Steganography mode. May choose between LSB1, LSB4, LSBE")
+            usage = "Steganography mode.")
     private SteganograpyMode steganographyMode;
 
     @Option(name = "-a", aliases = { "--algorithm"}, required = false,
-            usage = "Algorithm used. <aes128 | aes192 | aes256 | des>")
+            usage = "Algorithm used.")
     private AlgoMode algoMode;
 
     @Option(name = "-m", aliases = { "--mode"}, required = false,
-            usage = " <ecb | cfb | ofb | cbc>")
+            usage = "Mode")
     private BlockMode blockMode;
 
-    @Option(name = "-pass", aliases = { "--pass"}, required = false,
+    @Option(name = "-pass", aliases = {"--pass"}, required = false,
             usage = "Password. Do I need to explain it?")
     private String password;
 
@@ -53,12 +58,16 @@ public class CliOptions {
             errorFree = true;
 
             parser.parseArgument(args);
+            if (isHelp()) {
+                parser.printUsage(System.out);
+                System.exit(0);
+            }
             if (isEmbed() && getInputBitmap() == null) {
                 errorFree = false;
             }
         } catch (CmdLineException e) {
             System.err.println(e.getMessage());
-            parser.printUsage(System.err);
+            parser.printUsage(System.out);
             System.exit(1);
         }
     }
@@ -79,27 +88,27 @@ public class CliOptions {
         this.extract = extract;
     }
 
-    public Path getInputBitmap() {
+    public File getInputBitmap() {
         return inputBitmap;
     }
 
-    public void setInputBitmap(Path inputBitmap) {
+    public void setInputBitmap(File inputBitmap) {
         this.inputBitmap = inputBitmap;
     }
 
-    public Path getCarrierFile() {
+    public File getCarrierFile() {
         return carrierFile;
     }
 
-    public void setCarrierFile(Path carrierFile) {
+    public void setCarrierFile(File carrierFile) {
         this.carrierFile = carrierFile;
     }
 
-    public Path getOutputBitmap() {
+    public File getOutputBitmap() {
         return outputBitmap;
     }
 
-    public void setOutputBitmap(Path outputBitmap) {
+    public void setOutputBitmap(File outputBitmap) {
         this.outputBitmap = outputBitmap;
     }
 
@@ -133,5 +142,13 @@ public class CliOptions {
 
     public void setPassword(String password) {
         this.password = password;
+    }
+
+    public boolean isHelp() {
+        return help;
+    }
+
+    public void setHelp(boolean help) {
+        this.help = help;
     }
 }
