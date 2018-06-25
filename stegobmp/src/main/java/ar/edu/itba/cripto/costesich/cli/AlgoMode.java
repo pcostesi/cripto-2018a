@@ -4,5 +4,5 @@ public enum AlgoMode {
     aes128,
     aes192,
     aes256,
-    des;
+    des,
 }

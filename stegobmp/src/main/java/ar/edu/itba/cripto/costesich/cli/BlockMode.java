@@ -4,5 +4,5 @@ public enum BlockMode {
     ecb,
     cfb,
     ofb,
-    cbc;
+    cbc,
 }
