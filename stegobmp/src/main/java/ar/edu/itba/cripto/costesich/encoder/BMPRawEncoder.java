@@ -1,5 +1,6 @@
 package ar.edu.itba.cripto.costesich.encoder;
 
+import ar.edu.itba.cripto.costesich.SecretMessage;
 import org.bouncycastle.util.Strings;
 
 import java.io.*;
@@ -12,19 +13,21 @@ import java.util.List;
 
 public class BMPRawEncoder<T extends Combiner> extends BMPEncoder<T> {
 
-    protected InputStream packSecretBytes(File secret) throws IOException {
-        var length = secret.length();
-        var sizeBuffer = ByteBuffer.allocate(4);
+    protected SecretMessage packSecretBytes(File secret) throws IOException {
+        var length = (int) secret.length();
+        var sizeBuffer = ByteBuffer.allocate(Integer.SIZE / Byte.SIZE);
         var extension = Strings.toByteArray(getExtension(secret));
 
         sizeBuffer.order(ByteOrder.LITTLE_ENDIAN);
-        sizeBuffer.putInt((int) length);
+        sizeBuffer.putInt(length);
+        sizeBuffer.flip();
 
         List<InputStream> streams = Arrays.asList(
                 new ByteArrayInputStream(sizeBuffer.array()),
                 Files.newInputStream(secret.toPath()),
                 new ByteArrayInputStream(extension));
-        return new SequenceInputStream(Collections.enumeration(streams));
+
+        return new SecretMessage(length, new SequenceInputStream(Collections.enumeration(streams)), extension);
     }
 
     protected final String getExtension(File file) {

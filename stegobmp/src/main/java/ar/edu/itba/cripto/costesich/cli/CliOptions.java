@@ -11,21 +11,21 @@ public class CliOptions {
     private boolean errorFree;
 
 
-    @Option(name = "-h", aliases = { "--help"}, required = false,
-            usage = "Help", forbids={"-embed", "--embed", "-extract", "--extract"})
+    @Option(name = "-h", aliases = {"--help"}, required = false,
+            usage = "Help", forbids = {"-embed", "--embed", "-extract", "--extract"})
     private boolean help;
 
-    @Option(name = "-embed", aliases = { "--embed"}, depends = {"-in"},
-            usage = "Embed mode", forbids={"-extract", "--extract"})
+    @Option(name = "-embed", aliases = {"--embed"}, depends = {"-in"},
+            usage = "Embed mode", forbids = {"-extract", "--extract"})
     private boolean embed;
 
-    @Option(name = "-extract", aliases = { "--extract"}, required = false,
-            usage = "Extract mode", forbids={"-embed", "--embed"})
+    @Option(name = "-extract", aliases = {"--extract"}, required = false,
+            usage = "Extract mode", forbids = {"-embed", "--embed"})
     private boolean extract;
 
     @Option(name = "-in", aliases = {"--input"}, required = false,
             usage = "File to hide️")
-    private File inputBitmap;
+    private File secretFile;
 
     @Option(name = "-p", aliases = {"--portador"}, required = true,
             usage = "Carrier file️️")
@@ -35,17 +35,17 @@ public class CliOptions {
             usage = "Output file")
     private File outputBitmap;
 
-    @Option(name = "-steg", aliases = { "--steg"}, required = true,
+    @Option(name = "-steg", aliases = {"--steg"}, required = true,
             usage = "Steganography mode.")
     private SteganograpyMode steganographyMode;
 
-    @Option(name = "-a", aliases = { "--algorithm"}, required = false,
+    @Option(name = "-a", aliases = {"--algorithm"}, required = false,
             usage = "Algorithm used.")
-    private AlgoMode algoMode;
+    private AlgoMode algoMode = AlgoMode.aes128;
 
-    @Option(name = "-m", aliases = { "--mode"}, required = false,
+    @Option(name = "-m", aliases = {"--mode"}, required = false,
             usage = "Mode")
-    private BlockMode blockMode;
+    private BlockMode blockMode = BlockMode.cbc;
 
     @Option(name = "-pass", aliases = {"--pass"}, required = false,
             usage = "Password. Do I need to explain it?")
@@ -62,7 +62,7 @@ public class CliOptions {
                 parser.printUsage(System.out);
                 System.exit(0);
             }
-            if (isEmbed() && getInputBitmap() == null) {
+            if (isEmbed() && getSecretFile() == null) {
                 errorFree = false;
             }
         } catch (CmdLineException e) {
@@ -88,12 +88,12 @@ public class CliOptions {
         this.extract = extract;
     }
 
-    public File getInputBitmap() {
-        return inputBitmap;
+    public File getSecretFile() {
+        return secretFile;
     }
 
-    public void setInputBitmap(File inputBitmap) {
-        this.inputBitmap = inputBitmap;
+    public void setSecretFile(File secretFile) {
+        this.secretFile = secretFile;
     }
 
     public File getCarrierFile() {

@@ -18,6 +18,7 @@ public class CipherHelper {
     final BlockMode mode;
     final byte[] key;
     final byte[] initVector;
+    public static final String DEFAULT_IV = "default value";
 
     public CipherHelper(AlgoMode algo, BlockMode mode, String password, String initVector) {
         try {
@@ -117,7 +118,6 @@ public class CipherHelper {
         }
         throw new IllegalArgumentException("Ooops");
     }
-
 
 
 }

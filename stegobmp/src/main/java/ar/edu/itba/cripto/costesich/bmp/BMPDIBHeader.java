@@ -11,7 +11,7 @@ import java.nio.channels.WritableByteChannel;
 
 public class BMPDIBHeader {
     private static final Logger logger = LoggerFactory.getLogger(BMPDIBHeader.class);
-
+    private final static int HEADER_SIZE = 36;
     private final int width;
     private final int height;
     private final short colorPlanes;
@@ -22,8 +22,6 @@ public class BMPDIBHeader {
     private final int verticalResolution;
     private final int numberOfColors;
     private final int numberOfImportantColors;
-
-    private final static int HEADER_SIZE = 36;
 
     public BMPDIBHeader(int width, int height, short colorPlanes, short bitsPerPixel, int compressionMode, int imageSize, int horizontalResolution, int verticalResolution, int numberOfColors, int numberOfImportantColors) {
         this.width = width;
@@ -50,7 +48,7 @@ public class BMPDIBHeader {
             case 40:
                 return channelToBitmapInfoHeader(channel);
             default:
-                throw new IllegalArgumentException("Unsupported DIB header");
+                throw new IllegalArgumentException("Unsupported DIB header, got size: " + size);
         }
     }
 
@@ -99,6 +97,7 @@ public class BMPDIBHeader {
 
         return this;
     }
+
     public int getWidth() {
         return width;
     }
@@ -143,7 +142,7 @@ public class BMPDIBHeader {
     @Override
     public String toString() {
         return String.format(
-                        "width: %d\n" +
+                "width: %d\n" +
                         "height: %d\n" +
                         "color planes: %d\n" +
                         "bits per pixel: %d\n" +
