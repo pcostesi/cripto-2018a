@@ -28,6 +28,7 @@ public class BMPPasswordProtectedDecoder<T extends Splitter> extends BMPRawDecod
     protected SecretMessage recompose(ReadableByteChannel encodedChannel) throws IOException {
         var secretLength = readSecretLength(encodedChannel);
         var cipher = cipherHelper.getDecryptionCipher();
+        System.out.println(secretLength);
         var cipheredInputStream = new BoundedInputStream(Channels.newInputStream(encodedChannel), secretLength);
         var cipherInputStream = new CipherInputStream(cipheredInputStream, cipher);
         return super.recompose(Channels.newChannel(cipherInputStream));
@@ -35,10 +36,12 @@ public class BMPPasswordProtectedDecoder<T extends Splitter> extends BMPRawDecod
 
 
     private int readSecretLength(ReadableByteChannel channel) throws IOException {
-        var buffer = ByteBuffer.allocate(4);
+        var buffer = ByteBuffer.allocate(Integer.SIZE / Byte.SIZE);
         buffer.order(ByteOrder.LITTLE_ENDIAN);
-        channel.read(buffer);
-        buffer.rewind();
+        do {
+            channel.read(buffer);
+        } while (buffer.position() < Integer.SIZE / Byte.SIZE);
+        buffer.flip();
         return buffer.getInt();
     }
 }
