@@ -10,7 +10,6 @@ import java.io.InputStream;
 import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
 import java.nio.channels.ReadableByteChannel;
-import java.util.Arrays;
 
 public abstract class LSBCombiner implements Combiner {
     private static final Logger logger = LoggerFactory.getLogger(LSBCombiner.class);

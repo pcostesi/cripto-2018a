@@ -12,7 +12,6 @@ import java.nio.channels.ReadableByteChannel;
 import java.nio.channels.WritableByteChannel;
 import java.nio.file.Files;
 import java.nio.file.StandardOpenOption;
-import java.util.Arrays;
 
 public abstract class BMPDecoder<T extends Splitter> implements Decoder<T> {
     private static final Logger logger = LoggerFactory.getLogger(BMPDecoder.class);

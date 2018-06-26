@@ -14,11 +14,11 @@ import java.security.NoSuchAlgorithmException;
 import java.util.Arrays;
 
 public class CipherHelper {
+    public static final String DEFAULT_IV = "default value";
     final AlgoMode algo;
     final BlockMode mode;
     final byte[] key;
     final byte[] initVector;
-    public static final String DEFAULT_IV = "default value";
 
     public CipherHelper(AlgoMode algo, BlockMode mode, String password, String initVector) {
         try {

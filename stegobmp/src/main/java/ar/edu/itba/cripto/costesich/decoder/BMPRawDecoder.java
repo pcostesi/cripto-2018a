@@ -1,7 +1,6 @@
 package ar.edu.itba.cripto.costesich.decoder;
 
 import ar.edu.itba.cripto.costesich.SecretMessage;
-import ar.edu.itba.cripto.costesich.encoder.BMPRawEncoder;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -14,6 +13,7 @@ import java.nio.channels.ReadableByteChannel;
 
 public class BMPRawDecoder<T extends Splitter> extends BMPDecoder<T> {
     private final static Logger logger = LoggerFactory.getLogger(BMPRawDecoder.class);
+
     @Override
     protected SecretMessage recompose(ReadableByteChannel encodedChannel) throws IOException {
         var fileLength = readFileLength(encodedChannel);

@@ -15,6 +15,7 @@ import java.nio.file.StandardOpenOption;
 
 public abstract class BMPEncoder<T extends Combiner> implements Encoder<T> {
     private static final Logger logger = LoggerFactory.getLogger(BMPEncoder.class);
+
     @Override
     public void encode(File image, File secret, File output, T combiner) throws IOException {
         var imageChannel = Files.newByteChannel(image.toPath(), StandardOpenOption.READ);
