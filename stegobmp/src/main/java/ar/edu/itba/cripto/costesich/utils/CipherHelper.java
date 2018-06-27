@@ -1,4 +1,4 @@
-package ar.edu.itba.cripto.costesich;
+package ar.edu.itba.cripto.costesich.utils;
 
 import ar.edu.itba.cripto.costesich.cli.AlgoMode;
 import ar.edu.itba.cripto.costesich.cli.BlockMode;
@@ -7,73 +7,24 @@ import javax.crypto.Cipher;
 import javax.crypto.NoSuchPaddingException;
 import javax.crypto.spec.IvParameterSpec;
 import javax.crypto.spec.SecretKeySpec;
-import java.security.InvalidAlgorithmParameterException;
-import java.security.InvalidKeyException;
-import java.security.MessageDigest;
-import java.security.NoSuchAlgorithmException;
-import java.util.Arrays;
+import java.security.*;
 
 public class CipherHelper {
-    public static final String DEFAULT_IV = "default value";
-    final AlgoMode algo;
-    final BlockMode mode;
-    final byte[] key;
-    final byte[] initVector;
+    public static final String ALGORITHM = "SHA-256";
+    private final AlgoMode algo;
+    private final BlockMode mode;
+    private final String password;
+    private final MessageDigest digest;
 
-    public CipherHelper(AlgoMode algo, BlockMode mode, String password, String initVector) {
+    public CipherHelper(AlgoMode algo, BlockMode mode, String password) {
         try {
             this.algo = algo;
             this.mode = mode;
-            this.key = deriveKey(algo, password);
-            this.initVector = deriveIV(algo, initVector);
+            this.password = password;
+            this.digest = MessageDigest.getInstance(ALGORITHM);
         } catch (NoSuchAlgorithmException e) {
-            throw new IllegalArgumentException("MD5 not available :(");
+            throw new IllegalArgumentException(ALGORITHM + " not available :(");
         }
-    }
-
-
-    private byte[] deriveKey(AlgoMode algo, String password) throws NoSuchAlgorithmException {
-        var digest = MessageDigest.getInstance("MD5");
-        digest.update(password.getBytes());
-
-        int keyLength = 0;
-        switch (algo) {
-            case des:
-                keyLength = 8;
-                break;
-            case aes128:
-                keyLength = 16;
-                break;
-            case aes192:
-                keyLength = 24;
-                break;
-            case aes256:
-                keyLength = 32;
-                break;
-            default:
-                throw new IllegalArgumentException("Invalid key length");
-        }
-        return Arrays.copyOf(digest.digest(), keyLength);
-    }
-
-    private byte[] deriveIV(AlgoMode algo, String initVector) throws NoSuchAlgorithmException {
-        var digest = MessageDigest.getInstance("MD5");
-        digest.update(initVector.getBytes());
-
-        int ivLength = 0;
-        switch (algo) {
-            case des:
-                ivLength = 8;
-                break;
-            case aes128:
-            case aes192:
-            case aes256:
-                ivLength = 16;
-                break;
-            default:
-                throw new IllegalArgumentException("Invalid iv length");
-        }
-        return Arrays.copyOf(digest.digest(), ivLength);
     }
 
     public Cipher getEncryptionCipher() {
@@ -85,14 +36,17 @@ public class CipherHelper {
     }
 
     private Cipher getCipher(int encryptionMode) {
-        String algoName = algo == AlgoMode.des ? "DES" : "AES";
-        String modeName = mode.name().toUpperCase();
-        String cipherInstance = algoName + "/" + modeName + "/" + "PKCS5Padding";
+
+        var algoName = algo.getAlgoName();
+        var modeName = mode.name().toUpperCase();
+        var paddingName = encryptionMode == Cipher.ENCRYPT_MODE ? "PKCS5Padding" : "NoPadding";
+        var cipherInstance = algoName + "/" + modeName + "/" + paddingName;
 
         try {
-            var initVectorSpec = new IvParameterSpec(initVector);
             var cipher = Cipher.getInstance(cipherInstance);
-            var keySpec = new SecretKeySpec(key, algoName);
+            var keyAndIv = new KeyAndIVHelper(password, algo, cipher, digest);
+            var initVectorSpec = new IvParameterSpec(keyAndIv.getIv());
+            var keySpec = new SecretKeySpec(keyAndIv.getKey(), algoName);
 
             switch (mode) {
                 case ecb:

@@ -29,18 +29,18 @@ public abstract class LSBCombiner implements Combiner {
     protected ReadableByteChannel getByteStream(ReadableByteChannel pixelChannel, InputStream secret, int fileSize) {
 
         var pixelBuffer = ByteBuffer.allocate(getBufferSize());
-        pixelBuffer.order(ByteOrder.LITTLE_ENDIAN);
+        pixelBuffer.order(ByteOrder.BIG_ENDIAN);
 
         return new ReadableByteChannel() {
             private boolean isOpen = pixelChannel.isOpen();
             private byte[] bytes = pixelBuffer.array();
-            private boolean doneWithSecret = false;
+            private int interpolated = 0;
 
             private int insertByte(int secretByte) throws IOException {
+                interpolated++;
                 var read = pixelChannel.read(pixelBuffer);
                 pixelBuffer.flip();
                 if (secretByte == -1) {
-                    doneWithSecret = true;
                     return read;
                 }
                 if (secretByte != -1 && read == getBufferSize()) {
@@ -52,7 +52,7 @@ public abstract class LSBCombiner implements Combiner {
 
             @Override
             public int read(ByteBuffer dst) throws IOException {
-                if (doneWithSecret) {
+                if (interpolated >= fileSize) {
                     return pixelChannel.read(dst);
                 }
                 var read = insertByte(secret.read());

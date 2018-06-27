@@ -24,28 +24,36 @@ public abstract class LSBSplitter implements Splitter {
     protected ReadableByteChannel getEncodedFile(ReadableByteChannel pixelChannel) throws IOException {
 
         var buffer = ByteBuffer.allocate(getBufferSize());
-        buffer.order(ByteOrder.LITTLE_ENDIAN);
+        buffer.order(ByteOrder.BIG_ENDIAN);
 
         return new ReadableByteChannel() {
+            private byte[] readByte() throws IOException {
+                int read;
+                do {
+                    read = pixelChannel.read(buffer);
+                    if (read == -1) {
+                        return null;
+                    }
+                } while (read < getBufferSize());
 
-            private int readByte() throws IOException {
-                var read = pixelChannel.read(buffer);
                 buffer.flip();
-                if (read < getBufferSize()) {
-                    return -1;
-                }
-                var raw = buffer.array();
-                return decodeByte(raw);
+                return buffer.array();
             }
 
             @Override
             public int read(ByteBuffer dst) throws IOException {
-                var theValue = readByte();
-                if (theValue == -1) {
-                    return -1;
+                var read = 0;
+                while (dst.hasRemaining()) {
+                    var theValue = readByte();
+                    if (theValue == null && read > 0) {
+                        break;
+                    } else if (theValue == null && read == 0) {
+                        return -1;
+                    }
+                    dst.put(decodeByte(theValue));
+                    read++;
                 }
-                dst.put((byte) theValue);
-                return 1;
+                return read;
             }
 
             @Override

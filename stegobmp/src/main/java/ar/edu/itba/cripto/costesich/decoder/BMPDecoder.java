@@ -19,6 +19,7 @@ public abstract class BMPDecoder<T extends Splitter> implements Decoder<T> {
     @Override
     public void decode(File image, File output, T splitter) throws IOException {
         var imageChannel = Files.newByteChannel(image.toPath(), StandardOpenOption.READ);
+        output.delete();
         output.createNewFile();
         var outputChannel = Files.newByteChannel(output.toPath(), StandardOpenOption.WRITE);
 
@@ -32,6 +33,8 @@ public abstract class BMPDecoder<T extends Splitter> implements Decoder<T> {
         System.out.println("standing at " + imageChannel.position());
         var message = recompose(splitter.splitAll(header, imageChannel));
         serializeMessage(message, outputChannel);
+        System.out.println(imageChannel.position());
+        System.out.println(message.getSize() - imageChannel.position());
     }
 
     abstract protected SecretMessage recompose(ReadableByteChannel secret) throws IOException;

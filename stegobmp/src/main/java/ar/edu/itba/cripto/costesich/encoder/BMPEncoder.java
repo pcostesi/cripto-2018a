@@ -19,6 +19,7 @@ public abstract class BMPEncoder<T extends Combiner> implements Encoder<T> {
     @Override
     public void encode(File image, File secret, File output, T combiner) throws IOException {
         var imageChannel = Files.newByteChannel(image.toPath(), StandardOpenOption.READ);
+        output.delete();
         output.createNewFile();
         var outputChannel = Files.newByteChannel(output.toPath(), StandardOpenOption.WRITE);
 
