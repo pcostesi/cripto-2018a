@@ -10,6 +10,8 @@ import ch.qos.logback.classic.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
+import java.io.OutputStream;
+import java.io.OutputStreamWriter;
 import java.nio.file.Files;
 
 public class App {
@@ -28,7 +30,9 @@ public class App {
 
         for (var splitter : splitters) {
             try {
-                System.out.println("Guessing with " + splitter.getClass().getSimpleName());
+                var splitterName = splitter.getClass().getSimpleName();
+                var filename = carrier.toPath().getFileName();
+                System.out.println("Guessing if " + filename + " can be decoded with " + splitterName);
                 var ext = decoder.decode(carrier, Files.createTempFile("stegobmp-", "-guess").toFile(), splitter);
                 if (!ext.startsWith(".")) {
                     System.out.println("- Extension does not seem to be valid");
@@ -113,7 +117,35 @@ public class App {
     }
 
 
+    private static void printASCIIArt(OutputStream output) {
+        var writer = new OutputStreamWriter(output);
+        try {
+            writer.write("STEGOBMP\n" +
+                    "                         .       .\n" +
+                    "                        / `.   .' \\\n" +
+                    "                .---.  <    > <    >  .---.\n" +
+                    "                |    \\  \\ - ~ ~ - /  /    |\n" +
+                    "                 ~-..-~             ~-..-~\n" +
+                    "             \\~~~\\.'                    `./~~~/\n" +
+                    "              \\__/                        \\__/\n" +
+                    "               /                  .-    .  \\\n" +
+                    "        _._ _.-    .-~ ~-.       /       }   \\/~~~/\n" +
+                    "    _.-'q  }~     /       }     {        ;    \\__/\n" +
+                    "   {'__,  /      (       /      {       /      `. ,~~|   .     .\n" +
+                    "    `''''='~~-.__(      /_      |      /- _      `..-'   \\\\   //\n" +
+                    "                / \\   =/  ~~--~~{    ./|    ~-.     `-..__\\\\_//_.-'\n" +
+                    "               {   \\  +\\         \\  =\\ (        ~ - . _ _ _..---~\n" +
+                    "               |  | {   }         \\   \\_\\\n" +
+                    "              '---.o___,'       .o___,'\nSTEGO.BMP\n\n\n"
+            );
+            writer.flush();
+        } catch (IOException e) {
+        }
+    }
+
+
     public static void main(String... args) {
+        printASCIIArt(System.out);
         CliOptions options = parseOptions(args);
 
         if (options.isQuiet()) {
