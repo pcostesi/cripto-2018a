@@ -44,7 +44,7 @@ public abstract class LSBSplitter implements Splitter {
                 while (dst.hasRemaining()) {
                     var theValue = readByte();
                     if (theValue == null && read > 0) {
-                        break;
+                        return read;
                     } else if (theValue == null && read == 0) {
                         return -1;
                     }

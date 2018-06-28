@@ -34,7 +34,7 @@ public class BMPRawDecoder<T extends Splitter> extends BMPDecoder<T> {
         buffer.order(ByteOrder.BIG_ENDIAN);
         do {
             if (channel.read(buffer) == -1) {
-                throw new IOException("Unexpected end of BMP file");
+                throw new IOException("Unexpected end of BMP file reading file length");
             }
         } while (buffer.position() < buffer.capacity());
         buffer.flip();
@@ -44,7 +44,9 @@ public class BMPRawDecoder<T extends Splitter> extends BMPDecoder<T> {
     private InputStream readFileContent(ReadableByteChannel channel, int fileLength) throws IOException {
         var buffer = ByteBuffer.allocate(fileLength);
         do {
-            channel.read(buffer);
+            if (channel.read(buffer) == -1) {
+                throw new IOException("Unexpected end of BMP file reading body");
+            }
         } while (buffer.position() < buffer.capacity());
         buffer.rewind();
         return new ByteArrayInputStream(buffer.array());
@@ -56,6 +58,9 @@ public class BMPRawDecoder<T extends Splitter> extends BMPDecoder<T> {
         var builder = new StringBuilder();
         while ((c = is.read()) > 0) {
             builder.append((char) c);
+        }
+        if (c == -1) {
+            throw new IOException("Unexpected end of BMP file reading extension");
         }
         return builder.toString();
     }

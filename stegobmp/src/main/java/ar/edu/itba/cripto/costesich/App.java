@@ -29,13 +29,14 @@ public class App {
         for (var splitter : splitters) {
             try {
                 System.out.println("Guessing with " + splitter.getClass().getSimpleName());
-                var ext = decoder.decode(carrier, Files.createTempFile("", "").toFile(), splitter);
+                var ext = decoder.decode(carrier, Files.createTempFile("stegobmp-", "-guess").toFile(), splitter);
                 if (!ext.startsWith(".")) {
                     System.out.println("- Extension does not seem to be valid");
                     continue;
                 }
                 System.out.println("- " + carrier.getName() + " seems to be a " + ext +
                         " encoded with " + splitter.getClass().getSimpleName().substring(0, 4));
+                decoder.decode(carrier, options.getOutputBitmap(), splitter);
             } catch (Exception e) {
                 System.out.println("- Hmm, nope.");
             }
