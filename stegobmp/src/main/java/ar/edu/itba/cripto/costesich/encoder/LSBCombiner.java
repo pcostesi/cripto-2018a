@@ -17,7 +17,8 @@ public abstract class LSBCombiner implements Combiner {
     @Override
     public ReadableByteChannel combineAll(BMPHeader header, ReadableByteChannel pixelChannel, SecretMessage secret) throws IOException {
         if (header.getImageSize() < secret.getSize() * getBufferSize()) {
-            throw new IllegalArgumentException("The secret file is too large and the image too small");
+            var max = header.getImageSize() / getBufferSize();
+            throw new IllegalArgumentException("The secret file is too large. Can fit at most " + max + " bytes.");
         }
 
         return getByteStream(pixelChannel, secret.getStream());
@@ -36,12 +37,14 @@ public abstract class LSBCombiner implements Combiner {
             @Override
             public int read(ByteBuffer dst) throws IOException {
                 var secretByte = secret.read();
+                // fast copy.
                 if (secretByte == -1) {
                     return pixelChannel.read(dst);
                 }
+
                 var read = pixelStream.read(pixels);
                 if (read == -1) {
-                    throw new IOException("secret too large");
+                    throw new IOException("secret too large.");
                 } else if (read < getBufferSize()) {
                     dst.put(pixels, 0, read);
                     return read;
