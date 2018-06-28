@@ -34,8 +34,7 @@ public class App {
                     System.out.println("- Extension does not seem to be valid");
                     continue;
                 }
-                System.out.println();
-                System.out.println(carrier.getName() + " seems to be a " + ext +
+                System.out.println("- " + carrier.getName() + " seems to be a " + ext +
                         " encoded with " + splitter.getClass().getSimpleName().substring(0, 4));
             } catch (Exception e) {
                 System.out.println("- Hmm, nope.");

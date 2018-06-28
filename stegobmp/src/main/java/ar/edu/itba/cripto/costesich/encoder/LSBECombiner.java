@@ -20,7 +20,7 @@ public class LSBECombiner implements Combiner {
         var bytes = Channels.newInputStream(pixelChannel).readAllBytes();
         var encodeable = 0;
         for (var i = 0; i < bytes.length; i++) {
-            if (bytes[i] == -127 || bytes[i] == -126 ) {
+            if (bytes[i] == (byte)255 || bytes[i] == (byte)254 ) {
                 encodeable++;
             }
         }
@@ -28,6 +28,7 @@ public class LSBECombiner implements Combiner {
             throw new IllegalArgumentException("Secret file too large. Can fit at most " + encodeable + "bytes");
         }
 
+        pixelChannel.close();
         return getByteStream(bytes, secret.getStream());
     }
 
@@ -59,15 +60,15 @@ public class LSBECombiner implements Combiner {
                     }
                     if (secretByte == -1) {
                         done = true;
-                        return read(dst);
+                        break;
                     }
                     if (pixels[pixelIdx] == (byte)255 || pixels[pixelIdx] == (byte)254) {
-                        var value = (byte) ((pixels[pixelIdx] & 0b11111110) | ((secretByte >> --idx) & 1));
+                        var value = (byte) ((pixels[pixelIdx] & 0b11111110) | ((secretByte >> --idx) & 0b00000001));
                         dst.put(value);
-                        read++;
                     } else {
                         dst.put(pixels[pixelIdx]);
                     }
+                    read++;
                     pixelIdx++;
                 }
                 return read;
