@@ -10,6 +10,13 @@ public class CliOptions {
 
     private boolean errorFree;
 
+    @Option(name = "-g", aliases = {"--guess"}, required = false,
+            usage = "Brute force raw embedded files", forbids = {"-embed", "--embed", "-extract", "--extract"})
+    private boolean guess;
+
+    @Option(name = "-q", aliases = {"--quiet"}, required = false,
+            usage = "Shhhh")
+    private boolean quiet;
 
     @Option(name = "-h", aliases = {"--help"}, required = false,
             usage = "Help", forbids = {"-embed", "--embed", "-extract", "--extract"})
@@ -150,5 +157,21 @@ public class CliOptions {
 
     public void setHelp(boolean help) {
         this.help = help;
+    }
+
+    public boolean isQuiet() {
+        return quiet;
+    }
+
+    public void setQuiet(boolean quiet) {
+        this.quiet = quiet;
+    }
+
+    public boolean isGuess() {
+        return guess;
+    }
+
+    public void setGuess(boolean guess) {
+        this.guess = guess;
     }
 }

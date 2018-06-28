@@ -43,6 +43,9 @@ public abstract class BMPEncoder<T extends Combiner> implements Encoder<T> {
         var inputStream = Channels.newInputStream(input);
         var outputStream = Channels.newOutputStream(output);
         inputStream.transferTo(outputStream);
+        inputStream.close();
+        outputStream.close();
+        logger.info("Serialized. Streams closed.");
     }
 
     protected abstract SecretMessage packSecretBytes(File secret) throws IOException;

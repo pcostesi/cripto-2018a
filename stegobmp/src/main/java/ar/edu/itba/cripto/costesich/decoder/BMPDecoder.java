@@ -17,7 +17,7 @@ public abstract class BMPDecoder<T extends Splitter> implements Decoder<T> {
     private static final Logger logger = LoggerFactory.getLogger(BMPDecoder.class);
 
     @Override
-    public void decode(File image, File output, T splitter) throws IOException {
+    public String decode(File image, File output, T splitter) throws IOException {
         var imageChannel = Files.newByteChannel(image.toPath(), StandardOpenOption.READ);
         output.delete();
         output.createNewFile();
@@ -30,18 +30,22 @@ public abstract class BMPDecoder<T extends Splitter> implements Decoder<T> {
             throw new IllegalArgumentException("Pixel size should be 24bits");
         }
 
-        System.out.println("standing at " + imageChannel.position());
-        var message = recompose(splitter.splitAll(header, imageChannel));
+        var message = recompose(splitter.splitAll(header, imageChannel), header);
         serializeMessage(message, outputChannel);
-        System.out.println(imageChannel.position());
-        System.out.println(message.getSize() - imageChannel.position());
+        return message.getExtension();
     }
 
-    abstract protected SecretMessage recompose(ReadableByteChannel secret) throws IOException;
+
+    abstract protected SecretMessage recompose(ReadableByteChannel secret, BMPHeader header) throws IOException;
 
     private void serializeMessage(SecretMessage message, WritableByteChannel output) throws IOException {
         logger.info("Serializing to file");
         // Pipe
-        message.getStream().transferTo(Channels.newOutputStream(output));
+        var in = message.getStream();
+        var out = Channels.newOutputStream(output);
+        in.transferTo(out);
+        in.close();
+        out.close();
+        logger.info("File saved. Streams closed.");
     }
 }

@@ -20,14 +20,14 @@ public abstract class LSBCombiner implements Combiner {
             throw new IllegalArgumentException("The secret file is too large and the image too small");
         }
 
-        return getByteStream(pixelChannel, secret.getStream(), secret.getSize());
+        return getByteStream(pixelChannel, secret.getStream());
     }
 
     protected abstract byte[] transformByte(byte[] bytes, byte secretByte);
 
     protected abstract int getBufferSize();
 
-    private ReadableByteChannel getByteStream(ReadableByteChannel pixelChannel, InputStream secret, int fileSize) {
+    private ReadableByteChannel getByteStream(ReadableByteChannel pixelChannel, InputStream secret) {
         var pixels = new byte[getBufferSize()];
         var pixelStream = Channels.newInputStream(pixelChannel);
 

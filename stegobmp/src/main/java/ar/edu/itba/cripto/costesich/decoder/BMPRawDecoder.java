@@ -1,6 +1,7 @@
 package ar.edu.itba.cripto.costesich.decoder;
 
 import ar.edu.itba.cripto.costesich.SecretMessage;
+import ar.edu.itba.cripto.costesich.bmp.BMPHeader;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -11,18 +12,19 @@ import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
 import java.nio.channels.Channels;
 import java.nio.channels.ReadableByteChannel;
-import java.util.Arrays;
-import java.util.stream.Stream;
 
 public class BMPRawDecoder<T extends Splitter> extends BMPDecoder<T> {
     private final static Logger logger = LoggerFactory.getLogger(BMPRawDecoder.class);
 
     @Override
-    protected SecretMessage recompose(ReadableByteChannel encodedChannel) throws IOException {
+    protected SecretMessage recompose(ReadableByteChannel encodedChannel, BMPHeader header) throws IOException {
         var fileLength = readFileLength(encodedChannel);
-        logger.info("file length is {}", fileLength);
+        if (fileLength < 0 || fileLength > header.getImageSize()) {
+            throw new IOException("Embedded size doesn't make sense: " + fileLength);
+        }
         var fileContent = readFileContent(encodedChannel, fileLength);
         var extension = readFileExtension(encodedChannel);
+        logger.info("file length is {}, file extension is {}", fileLength, extension);
         return new SecretMessage(fileLength, fileContent, extension);
     }
 
@@ -31,7 +33,9 @@ public class BMPRawDecoder<T extends Splitter> extends BMPDecoder<T> {
         var buffer = ByteBuffer.allocate(Integer.SIZE / Byte.SIZE);
         buffer.order(ByteOrder.BIG_ENDIAN);
         do {
-            channel.read(buffer);
+            if (channel.read(buffer) == -1) {
+                throw new IOException("Unexpected end of BMP file");
+            }
         } while (buffer.position() < buffer.capacity());
         buffer.flip();
         return buffer.getInt();
@@ -42,6 +46,7 @@ public class BMPRawDecoder<T extends Splitter> extends BMPDecoder<T> {
         do {
             channel.read(buffer);
         } while (buffer.position() < buffer.capacity());
+        buffer.rewind();
         return new ByteArrayInputStream(buffer.array());
     }
 
@@ -50,7 +55,7 @@ public class BMPRawDecoder<T extends Splitter> extends BMPDecoder<T> {
         int c;
         var builder = new StringBuilder();
         while ((c = is.read()) > 0) {
-            builder.append(c);
+            builder.append((char) c);
         }
         return builder.toString();
     }

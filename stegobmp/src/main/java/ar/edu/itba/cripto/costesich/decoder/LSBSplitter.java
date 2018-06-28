@@ -11,8 +11,6 @@ public abstract class LSBSplitter implements Splitter {
     @Override
     public ReadableByteChannel splitAll(BMPHeader header, ReadableByteChannel pixelChannel) throws IOException {
         var pixels = header.getImageSize() / header.getDib().getBitsPerPixel() * Byte.SIZE;
-        System.out.println("Number of pixels: " + pixels);
-
         return getEncodedFile(pixelChannel);
 
     }

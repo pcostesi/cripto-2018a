@@ -2,6 +2,7 @@ package ar.edu.itba.cripto.costesich.utils;
 
 import ar.edu.itba.cripto.costesich.cli.AlgoMode;
 import ar.edu.itba.cripto.costesich.cli.BlockMode;
+import org.bouncycastle.crypto.paddings.BlockCipherPadding;
 
 import javax.crypto.Cipher;
 import javax.crypto.NoSuchPaddingException;
@@ -39,7 +40,7 @@ public class CipherHelper {
 
         var algoName = algo.getAlgoName();
         var modeName = mode.name().toUpperCase();
-        var paddingName = encryptionMode == Cipher.ENCRYPT_MODE ? "PKCS5Padding" : "NoPadding";
+        var paddingName = "PKCS5Padding";
         var cipherInstance = algoName + "/" + modeName + "/" + paddingName;
 
         try {
