@@ -40,7 +40,7 @@ public class CipherHelper {
 
         var algoName = algo.getAlgoName();
         var modeName = mode.name().toUpperCase();
-        var paddingName = "PKCS5Padding";
+        var paddingName = encryptionMode == Cipher.ENCRYPT_MODE ? "PKCS5Padding" : "NoPadding";
         var cipherInstance = algoName + "/" + modeName + "/" + paddingName;
 
         try {

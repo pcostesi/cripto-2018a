@@ -39,9 +39,9 @@ public class BMPPasswordProtectedDecoder<T extends Splitter> extends BMPRawDecod
         }
         var cipherHelper = new CipherHelper(algo, mode, password);
         var cipher = cipherHelper.getDecryptionCipher();
-        if (secretLength % cipher.getBlockSize() != 0) {
-            throw new IOException("The embedded file wasn't padded correctly");
-        }
+//        if (secretLength % cipher.getBlockSize() != 0) {
+//            throw new IOException("The embedded file wasn't padded correctly");
+//        }
         var cipheredInputStream = readFileContent(encodedChannel, secretLength, cipher);
 
         var decryptedInputStream = new CipherInputStream(cipheredInputStream, cipher);
