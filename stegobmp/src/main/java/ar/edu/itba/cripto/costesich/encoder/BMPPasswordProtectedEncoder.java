@@ -8,6 +8,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import javax.crypto.Cipher;
+import javax.crypto.CipherInputStream;
 import javax.crypto.CipherOutputStream;
 import java.io.*;
 import java.nio.ByteBuffer;
@@ -28,16 +29,9 @@ public class BMPPasswordProtectedEncoder<T extends Combiner> extends BMPRawEncod
         var originalBytes = super.packSecretBytes(secret);
         var cipher = cipherHelper.getEncryptionCipher();
 
-        // workaround: we need an inputstream, but the cipher will encode the data
-        // to an outputstream. So we just pipe data from one to the other.
-        var tempOutputStream = new ByteArrayOutputStream();
-        var cipherOutputStream = new CipherOutputStream(tempOutputStream, cipher);
+        var cis = new CipherInputStream(originalBytes.getStream(), cipher);
 
-        // Then we encrypt the data using the original message as a source
-        originalBytes.getStream().transferTo(cipherOutputStream);
         var size = getCipheredSize(originalBytes, cipher);
-        cipherOutputStream.close();
-        tempOutputStream.close();
 
         var extension = originalBytes.getExtension();
 
@@ -52,7 +46,7 @@ public class BMPPasswordProtectedEncoder<T extends Combiner> extends BMPRawEncod
 
         var streams = Arrays.asList(
                 new ByteArrayInputStream(sizeBuffer.array()),
-                new ByteArrayInputStream(tempOutputStream.toByteArray()));
+                cis);
         return new SecretMessage(size, new SequenceInputStream(Collections.enumeration(streams)), extension);
     }
 
