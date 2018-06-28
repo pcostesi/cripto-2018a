@@ -22,10 +22,7 @@ public class BMPRawDecoder<T extends Splitter> extends BMPDecoder<T> {
         if (fileLength < 0 || fileLength > header.getImageSize()) {
             throw new IOException("Embedded size doesn't make sense: " + fileLength);
         }
-        var fileContent = readFileContent(encodedChannel, fileLength);
-        var extension = readFileExtension(encodedChannel);
-        logger.info("file length is {}, file extension is {}", fileLength, extension);
-        return new SecretMessage(fileLength, fileContent, extension);
+        return new SecretMessage(fileLength, Channels.newInputStream(encodedChannel), null);
     }
 
 
@@ -41,27 +38,4 @@ public class BMPRawDecoder<T extends Splitter> extends BMPDecoder<T> {
         return buffer.getInt();
     }
 
-    private InputStream readFileContent(ReadableByteChannel channel, int fileLength) throws IOException {
-        var buffer = ByteBuffer.allocate(fileLength);
-        do {
-            if (channel.read(buffer) == -1) {
-                throw new IOException("Unexpected end of BMP file reading body");
-            }
-        } while (buffer.position() < buffer.capacity());
-        buffer.rewind();
-        return new ByteArrayInputStream(buffer.array());
-    }
-
-    private String readFileExtension(ReadableByteChannel channel) throws IOException {
-        var is = Channels.newInputStream(channel);
-        int c;
-        var builder = new StringBuilder();
-        while ((c = is.read()) > 0) {
-            builder.append((char) c);
-        }
-        if (c == -1) {
-            throw new IOException("Unexpected end of BMP file reading extension");
-        }
-        return builder.toString();
-    }
 }

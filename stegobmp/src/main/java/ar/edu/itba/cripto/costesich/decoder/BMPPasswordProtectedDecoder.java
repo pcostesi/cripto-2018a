@@ -51,7 +51,6 @@ public class BMPPasswordProtectedDecoder<T extends Splitter> extends BMPRawDecod
 
     private InputStream readFileContent(ReadableByteChannel channel, int fileLength, Cipher c) throws IOException {
         fileLength = c.getOutputSize(fileLength);
-        System.out.println(fileLength);
         var buffer = ByteBuffer.allocate(fileLength);
         do {
             channel.read(buffer);
