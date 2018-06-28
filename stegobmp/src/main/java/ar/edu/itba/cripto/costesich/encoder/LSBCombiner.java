@@ -8,7 +8,7 @@ import org.slf4j.LoggerFactory;
 import java.io.IOException;
 import java.io.InputStream;
 import java.nio.ByteBuffer;
-import java.nio.ByteOrder;
+import java.nio.channels.Channels;
 import java.nio.channels.ReadableByteChannel;
 
 public abstract class LSBCombiner implements Combiner {
@@ -19,59 +19,44 @@ public abstract class LSBCombiner implements Combiner {
         if (header.getImageSize() < secret.getSize() * getBufferSize()) {
             throw new IllegalArgumentException("The secret file is too large and the image too small");
         }
+
         return getByteStream(pixelChannel, secret.getStream(), secret.getSize());
     }
 
-    protected abstract void transformByte(byte[] bytes, byte secretByte);
+    protected abstract byte[] transformByte(byte[] bytes, byte secretByte);
 
     protected abstract int getBufferSize();
 
-    protected ReadableByteChannel getByteStream(ReadableByteChannel pixelChannel, InputStream secret, int fileSize) {
-
-        var pixelBuffer = ByteBuffer.allocate(getBufferSize());
-        pixelBuffer.order(ByteOrder.BIG_ENDIAN);
+    private ReadableByteChannel getByteStream(ReadableByteChannel pixelChannel, InputStream secret, int fileSize) {
+        var pixels = new byte[getBufferSize()];
+        var pixelStream = Channels.newInputStream(pixelChannel);
 
         return new ReadableByteChannel() {
-            private boolean isOpen = pixelChannel.isOpen();
-            private byte[] bytes = pixelBuffer.array();
-            private int interpolated = 0;
-
-            private int insertByte(int secretByte) throws IOException {
-                interpolated++;
-                var read = pixelChannel.read(pixelBuffer);
-                pixelBuffer.flip();
-                if (secretByte == -1) {
-                    return read;
-                }
-                if (secretByte != -1 && read == getBufferSize()) {
-                    transformByte(bytes, (byte) secretByte);
-                }
-                return read;
-            }
-
 
             @Override
             public int read(ByteBuffer dst) throws IOException {
-                if (interpolated >= fileSize) {
+                var secretByte = secret.read();
+                if (secretByte == -1) {
                     return pixelChannel.read(dst);
                 }
-                var read = insertByte(secret.read());
+                var read = pixelStream.read(pixels);
                 if (read == -1) {
-                    return -1;
+                    throw new IOException("secret too large");
+                } else if (read < getBufferSize()) {
+                    dst.put(pixels, 0, read);
+                    return read;
                 }
-                dst.put(bytes, 0, read);
-                return read;
+                dst.put(transformByte(pixels, (byte) secretByte));
+                return getBufferSize();
             }
 
             @Override
             public boolean isOpen() {
-                return pixelChannel.isOpen() && isOpen;
+                return pixelChannel.isOpen();
             }
 
             @Override
             public void close() throws IOException {
-                pixelChannel.close();
-                secret.close();
             }
         };
     }

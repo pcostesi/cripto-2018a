@@ -44,7 +44,7 @@ public class BMPPasswordProtectedEncoder<T extends Combiner> extends BMPRawEncod
         var extension = originalBytes.getExtension();
 
         var sizeBuffer = ByteBuffer.allocate(Integer.SIZE / Byte.SIZE);
-        sizeBuffer.order(ByteOrder.LITTLE_ENDIAN);
+        sizeBuffer.order(ByteOrder.BIG_ENDIAN);
         sizeBuffer.putInt(size);
         sizeBuffer.flip();
 
@@ -60,7 +60,7 @@ public class BMPPasswordProtectedEncoder<T extends Combiner> extends BMPRawEncod
 
     private int getCipheredSize(SecretMessage secret, Cipher cipher) {
         var secretFileLength = secret.getSize();
-        var rawLength = 4 + secretFileLength + secret.getExtension().length;
+        var rawLength = 4 + secretFileLength + secret.getExtension().length();
         var blockSize = cipher.getBlockSize();
         return rawLength % blockSize == 0 ? rawLength : (Math.floorDiv(rawLength, blockSize) + 1) * blockSize;
     }

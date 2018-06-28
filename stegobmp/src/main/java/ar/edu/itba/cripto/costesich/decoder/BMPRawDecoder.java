@@ -12,6 +12,7 @@ import java.nio.ByteOrder;
 import java.nio.channels.Channels;
 import java.nio.channels.ReadableByteChannel;
 import java.util.Arrays;
+import java.util.stream.Stream;
 
 public class BMPRawDecoder<T extends Splitter> extends BMPDecoder<T> {
     private final static Logger logger = LoggerFactory.getLogger(BMPRawDecoder.class);
@@ -20,12 +21,8 @@ public class BMPRawDecoder<T extends Splitter> extends BMPDecoder<T> {
     protected SecretMessage recompose(ReadableByteChannel encodedChannel) throws IOException {
         var fileLength = readFileLength(encodedChannel);
         logger.info("file length is {}", fileLength);
-        var is = Channels.newInputStream(encodedChannel);
-        var bytes = is.readAllBytes();
-        System.out.println(bytes.length);
-        var fileContent = readFileContent(bytes, fileLength);
-        var extension = readFileExtension(bytes, fileLength);
-
+        var fileContent = readFileContent(encodedChannel, fileLength);
+        var extension = readFileExtension(encodedChannel);
         return new SecretMessage(fileLength, fileContent, extension);
     }
 
@@ -40,16 +37,21 @@ public class BMPRawDecoder<T extends Splitter> extends BMPDecoder<T> {
         return buffer.getInt();
     }
 
-    private InputStream readFileContent(byte[] bytes, int fileLength) throws IOException {
-        return new ByteArrayInputStream(bytes, 0, fileLength);
+    private InputStream readFileContent(ReadableByteChannel channel, int fileLength) throws IOException {
+        var buffer = ByteBuffer.allocate(fileLength);
+        do {
+            channel.read(buffer);
+        } while (buffer.position() < buffer.capacity());
+        return new ByteArrayInputStream(buffer.array());
     }
 
-    private byte[] readFileExtension(byte[] bytes, int fileLength) throws IOException {
-        var end = fileLength;
-
-        while (bytes[end] != 0 && end < bytes.length) {
-            end++;
+    private String readFileExtension(ReadableByteChannel channel) throws IOException {
+        var is = Channels.newInputStream(channel);
+        int c;
+        var builder = new StringBuilder();
+        while ((c = is.read()) > 0) {
+            builder.append(c);
         }
-        return Arrays.copyOfRange(bytes, fileLength, end);
+        return builder.toString();
     }
 }

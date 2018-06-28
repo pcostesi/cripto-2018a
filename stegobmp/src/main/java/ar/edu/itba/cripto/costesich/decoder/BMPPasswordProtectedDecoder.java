@@ -34,17 +34,9 @@ public class BMPPasswordProtectedDecoder<T extends Splitter> extends BMPRawDecod
         logger.info("Encrypted length is {}", secretLength);
         var cipherHelper = new CipherHelper(algo, mode, password);
         var cipher = cipherHelper.getDecryptionCipher();
-        // var cipheredInputStream = Channels.newInputStream(encodedChannel);
-        var cipheredInputStream = readFileContent(encodedChannel, secretLength);
+        var cipheredInputStream = Channels.newInputStream(encodedChannel);
         var cipherInputStream = new CipherInputStream(cipheredInputStream, cipher);
         return super.recompose(Channels.newChannel(cipherInputStream));
-    }
-
-    private InputStream readFileContent(ReadableByteChannel channel, int fileLength) throws IOException {
-        var buffer = ByteBuffer.allocate(fileLength);
-        channel.read(buffer);
-        buffer.rewind();
-        return new ByteArrayInputStream(buffer.array());
     }
 
     private int readSecretLength(ReadableByteChannel channel) throws IOException {
