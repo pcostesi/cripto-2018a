@@ -31,6 +31,10 @@ public abstract class BMPDecoder<T extends Splitter> implements Decoder<T> {
             throw new IllegalArgumentException("Pixel size should be 24bits");
         }
 
+        if (header.getDib().getCompressionMode() != 0) {
+            throw new IllegalArgumentException("Only uncompressed files are supported");
+        }
+
         var message = recompose(splitter.splitAll(header, imageChannel), header);
         var ext = serializeMessage(message, outputChannel);
         var size = message.getSize();

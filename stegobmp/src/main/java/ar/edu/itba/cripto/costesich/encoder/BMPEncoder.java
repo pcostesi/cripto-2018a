@@ -30,6 +30,10 @@ public abstract class BMPEncoder<T extends Combiner> implements Encoder<T> {
             throw new IllegalArgumentException("Pixel size should be 24bits");
         }
 
+        if (header.getDib().getCompressionMode() != 0) {
+            throw new IllegalArgumentException("Only uncompressed files are supported");
+        }
+
         var message = packSecretBytes(secret);
         var newContents = combiner.combineAll(header, imageChannel, message);
 
