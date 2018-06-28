@@ -10,6 +10,6 @@ public class LSB4Splitter extends LSBSplitter {
 
     @Override
     protected byte decodeByte(byte[] raw) {
-        return (byte) (raw[0] & 0b00001111 | (raw[1] & 0b00001111) << 4);
+        return (byte) ((raw[0] & 0b00001111) << 4 | (raw[1] & 0b00001111));
     }
 }
