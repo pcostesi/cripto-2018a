@@ -1,0 +1,70 @@
+\newgeometry{margin=2.5cm}
+\begin{titlepage}
+\thispagestyle{empty}
+\newcommand{\HRule}{\rule{\linewidth}{0.5mm}}
+\hspace{1cm}
+\center
+
+\includegraphics[width = 60mm]{itba-escudo.png}
+
+\textsc{\Large Instituto Tecnol\'ogico de Buenos Aires}\\[1.4cm]
+\textsc{\huge Criptografía y Seguridad}\\[0.8cm]
+\MSonehalfspacing
+\textsc{\Large Ingenier\'ia en Inform\'atica}\\[1.0cm]
+
+\HRule\\[0.4cm]
+\MSdoublespacing
+
+{ \huge \bfseries Esteganografía en BMPs}\\[0.2cm]
+{ \large Trabajo Pr\'actico Especial de Implementación}\\[0.3cm]
+
+\HRule \\[2.4cm]
+\MSonehalfspacing
+
+\begin{minipage}[t]{0.8\textwidth}
+	\begin{itemize}
+	\item[\emph{Titulares:}] \textsc{Ramele}, Rodrigo;  \textsc{Roig}, Ana 
+	\item[\emph{Semestre:}] 2018A
+	\item[\emph{Grupo:}] 12
+	\item[\emph{Repositorio:}] https://github.com/pcostesi/cripto-2018a
+	\item[\emph{Revisión:}] \today
+    \item[\emph{Entrega:}] 28 de Junio de 2018 a las 23:59hs
+    \item[\emph{Autor:}]
+    	\textsc{Costesich}, Pablo Alejandro (\#50109)
+    \end{itemize}
+\end{minipage}
+
+\end{titlepage}
+\restoregeometry
+\microtypesetup{protrusion=false}
+\null\vspace{\fill}
+\begin{abstract}
+Se presenta un trabajo práctico especial donde se implementa un programa `\texttt{stegobmp.jar}` con modos de inclusión y extracción de archivos varios a BMPs V3 mediante sistemas de ocultamiento LSB1, LSB4 y LSBE. Se incluye la posibilidad de cifrar el contenido previo a la inclusión utilizando AES en sus variantes 128, 192 y 256, así como también DES. Se soportan los modos ECB, CFB, OFB y CBC.
+
+Se analiza el contenido de cuatro archivos provistos por la cátedra, así como propios, y se detalla el resultado de las particularidades de algunos modos de operación y contenidos. Se propone una serie de mejoras a la implementación.
+\end{abstract}
+
+\begin{dedication}
+Dedicado a Jeff Atwood y Joel Spolsky
+\end{dedication}
+\vspace{\fill}
+
+\microtypesetup{protrusion=true}
+\thispagestyle{empty}
+
+\newpage
+
+\setstretch{1.5}
+\microtypesetup{protrusion=false}
+
+\tableofcontents
+
+\newpage
+
+\microtypesetup{protrusion=true}
+\thispagestyle{empty}
+
+\MSonehalfspacing
+\newpage
+\setcounter{page}{1}
+\pagestyle{fancy}

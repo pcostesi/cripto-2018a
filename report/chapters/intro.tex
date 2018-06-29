@@ -1,0 +1,22 @@
+\section{Introducci\'on} \label{intro}
+En el repositorio de GitHub se encuentra tanto este informe como el código fuente del programa stegobmp en la carpeta homónima. El mismo está realizado en Java 10 y debe ser construido con Maven 3 o posterior. El informe está realizado en \LaTeX y se encuentra en la carpeta report.
+
+Adicionalmente, se provee una serie de archivos de soporte para compilar tanto el informe como la aplicación.
+
+\subsection{Compilación}
+
+Dado que es necesario utilizar Java 10 para compilar la aplicación por el uso extensivo de funcionalidades provistas por tal versión, el modo recomendado es mediante el archivo de Docker provisto. El mismo contiene todas las dependencias necesarias.
+
+Se provee un helper script para construir el binario mediante Docker, \texttt{build.sh}.
+
+El resultado de la compilaci\'on es una imagen de Docker que contiene tanto el Jar File como un ejecutable de Windows .EXE.
+
+\subsection{Modo de uso}
+
+Una vez generado el jar o el exe, debe utilizarse como se describe en la consigna. El ejecutable sigue estrictamente dicha interfaz y advertir\'a ante cualquier par\'ametro incorrecto. Bajo ciertas condiciones, algunas excepciones como errores de cifrado y tama\~no son expuestos al usuario.
+
+\subsection{Generación del informe}
+
+El informe tambi\'en es generado mediante una imagen de Docker que contiene una distribuci\'on completa de \LaTeX. La misma puede encontrarse en https://github.com/blang/latex-docker.
+
+Basta correr el archivo \texttt{latex.sh} para generar el reporte en pdf.

@@ -1,0 +1,21 @@
+\section{Implementación}
+	
+\subsection{Aplicación CLI}
+
+\subsubsection{Identificación de la línea de comandos}
+La línea de comandos es parseada con Args4J, que se encarga de todos los detalles como la generación del texto de ayuda y las opciones mutuamente excluyentes.
+
+\subsubsection{Métodos de instanciación}
+Se puede llamar al programa de distintas maneras:
+
+\begin{itemize}
+\item Embed: genera una instancia de un Encoder<>, con o sin cifrado, dependiendo de si se encuentran presentes los flags correctos.
+
+\item Extract: genera una instancia de un Decodedr<>, con o sin cifrado, dependiendo de si se encuentran presentes los flags correctos.
+
+\item Guess: aplica fuerza bruta para decifrar archivos.
+\end{itemize}
+
+\subsection{Cifrado}
+Se utiliza CipherInputStream ya que abstrae del manejo de bloques y buffers.
+\subsubsection{\texttt{CipherHelper}}

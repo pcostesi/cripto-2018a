@@ -68,4 +68,9 @@ public class BMPPasswordProtectedDecoder<T extends Splitter> extends BMPRawDecod
         buffer.flip();
         return buffer.getInt();
     }
+
+    @Override
+    public String toString() {
+        return "decoder " + algo + " " + mode;
+    }
 }

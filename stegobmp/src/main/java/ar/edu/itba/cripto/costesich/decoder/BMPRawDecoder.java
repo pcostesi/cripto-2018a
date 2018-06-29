@@ -38,4 +38,9 @@ public class BMPRawDecoder<T extends Splitter> extends BMPDecoder<T> {
         return buffer.getInt();
     }
 
+
+    @Override
+    public String toString() {
+        return "raw decoder";
+    }
 }

@@ -13,6 +13,7 @@ import java.io.IOException;
 import java.io.OutputStream;
 import java.io.OutputStreamWriter;
 import java.nio.file.Files;
+import java.util.Arrays;
 
 public class App {
     private static CliOptions parseOptions(final String... args) {
@@ -21,12 +22,52 @@ public class App {
     }
 
     public static void guess(CliOptions options) {
-        var splitters = new Splitter[] { new LSB1Splitter(), new LSB4Splitter(), new LSBESplitter() };
-        var decoder = new BMPRawDecoder();
-        var carrier = options.getCarrierFile();
-
         var rootLogger = (ch.qos.logback.classic.Logger) LoggerFactory.getLogger(Logger.ROOT_LOGGER_NAME);
         rootLogger.setLevel(Level.WARN);
+
+        if (options.getPassword() == null) {
+            guessWithoutPassword(options);
+        } else {
+            guessWithPassword(options);
+        }
+    }
+
+    private static void guessWithPassword(CliOptions options) {
+        var splitters = new Splitter[] { new LSB4Splitter(), new LSB1Splitter(), new LSBESplitter() };
+        var carrier = options.getCarrierFile();
+
+        var decoders = Arrays.stream(AlgoMode.values()).flatMap(algo ->
+            Arrays.stream(BlockMode.values()).map(blockMode ->
+                new BMPPasswordProtectedDecoder(algo, blockMode, options.getPassword())
+        )).toArray(i -> new Decoder[i]);
+
+        for (var decoder : decoders) {
+            for (var splitter : splitters) {
+                try {
+                    var splitterName = splitter.getClass().getSimpleName();
+                    var filename = carrier.toPath().getFileName();
+                    var cipher = decoder.toString();
+                    System.out.println("Guessing if " + filename + " can be decoded with " + splitterName + " + " + cipher);
+                    var ext = decoder.decode(carrier, Files.createTempFile("stegobmp-", "-guess").toFile(), splitter);
+                    if (!ext.startsWith(".")) {
+                        System.out.println("- Extension does not seem to be valid");
+                        continue;
+                    }
+                    System.out.println("- " + carrier.getName() + " seems to be a " + ext +
+                            " encoded with " + splitter.getClass().getSimpleName().substring(0, 4));
+                    decoder.decode(carrier, options.getOutputBitmap(), splitter);
+                } catch (Exception e) {
+                    System.out.println("- Hmm, nope.");
+                }
+            }
+        }
+
+    }
+
+    private static void guessWithoutPassword(CliOptions options) {
+        var splitters = new Splitter[] { new LSB4Splitter(), new LSB1Splitter(), new LSBESplitter() };
+        var decoder = new BMPRawDecoder();
+        var carrier = options.getCarrierFile();
 
         for (var splitter : splitters) {
             try {

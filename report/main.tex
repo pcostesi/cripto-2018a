@@ -1,0 +1,29 @@
+%Nicht anfassen, so ist der Dokumentenaufbau
+\documentclass[a4paper, 12pt]{article}
+
+\input{settings/packages}
+\input{settings/page}
+\begin{document}
+\input{settings/titlepage}
+\setcounter{page}{1}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%Ab hier Inhalt einfügen%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\input{chapters/intro.tex}
+\newpage
+
+\input{chapters/implementacion.tex}
+\newpage
+
+\input{chapters/cuestiones.tex}
+% \newpage
+
+% \input{chapters/conclusiones.tex}
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%Ende des Dokuments%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\newpage
+\input{settings/endofdocument}
+\end{document}

@@ -62,6 +62,10 @@ public abstract class BMPDecoder<T extends Splitter> implements Decoder<T> {
                 // If partial transfer, shift remainder down
                 // If buffer is empty, same as doing clear()
                 buffer.compact();
+            } else {
+                if (remaining - buffer.capacity() > 0) {
+                    throw new IOException("Trying to read past EOF");
+                }
             }
 
             // EOF will leave buffer in fill state
